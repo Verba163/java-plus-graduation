@@ -1,0 +1,52 @@
+application:
+  name: "ewm-main-service"
+  date-time-format: yyyy-MM-dd HH:mm:ss
+
+spring:
+  main:
+    banner-mode: OFF
+  jpa:
+    hibernate:
+      ddl-auto: update
+      format_sql: true
+      jdbc:
+        time_zone: UTC
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    username: "service"
+    password: "service"
+    url: "jdbc:postgresql://localhost:6543/ewm-main"
+stat-service:
+  protocol: http
+  host: localhost
+  port: 9090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework:
+      orm.jpa: WARN
+      orm.jpa.JpaTransactionManager: WARN
+      transaction: WARN
+      transaction.interceptor: WARN
+
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: "jdbc:postgresql://ewm-db:5432/ewm-main"
+stat-service:
+  host: stats-server

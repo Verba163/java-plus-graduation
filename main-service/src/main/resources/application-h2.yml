@@ -1,0 +1,33 @@
+application:
+  name: "ewm-main-service"
+  date-time-format: yyyy-MM-dd HH:mm:ss
+
+stat-service:
+  protocol: http
+  host: localhost
+  port: 9090
+
+spring:
+  main.banner-mode: OFF
+  jpa:
+    hibernate:
+      ddl-auto: none
+      format_sql: true
+      jdbc.time_zone: UTC
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    driverClassName: "org.h2.Driver"
+    url: "jdbc:h2:mem:ewm-main"
+    username: "service"
+    password: "service"
+
+logging:
+  level:
+    org.springframework:
+      orm.jpa: WARN
+      orm.jpa.JpaTransactionManager: WARN
+      transaction: WARN
+      transaction.interceptor: WARN

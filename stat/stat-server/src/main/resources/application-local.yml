@@ -1,0 +1,27 @@
+spring:
+  main.banner-mode: OFF
+  jpa:
+    hibernate:
+      ddl-auto: update
+      format_sql: true
+      jdbc.time_zone: UTC
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432:5432/ewm-stats"
+    username: "stat"
+    password: "stat"
+
+logging:
+  level:
+    org.springframework:
+      orm.jpa: WARN
+      orm.jpa.JpaTransactionManager: WARN
+      transaction: WARN
+      transaction.interceptor: WARN
+
+server:
+  port: 9090
