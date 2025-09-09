@@ -1,5 +1,6 @@
 package ru.practicum.ewm.client;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
