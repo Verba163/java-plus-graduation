@@ -10,13 +10,13 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>stat</artifactId>
+    <artifactId>stats</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>stat-server</module>
-        <module>stat-dto</module>
-        <module>stat-client</module>
+        <module>stats-server</module>
+        <module>stats-dto</module>
+        <module>stats-client</module>
     </modules>
     <build>
         <plugins>
