@@ -19,13 +19,13 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class StatClientImpl implements StatClient {
+public class StatsClientImpl implements StatClient {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final RestClient restClient;
     private final ObjectMapper mapper;
 
-    public StatClientImpl(RestClient restClient, ObjectMapper mapper) {
+    public StatsClientImpl(RestClient restClient, ObjectMapper mapper) {
         this.restClient = restClient;
         this.mapper = mapper;
     }
