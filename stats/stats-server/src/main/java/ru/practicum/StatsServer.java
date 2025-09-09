@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-public class StatServer {
+public class StatsServer {
     public static void main(String[] args) {
-        SpringApplication.run(StatServer.class, args);
+        SpringApplication.run(StatsServer.class, args);
     }
 }
