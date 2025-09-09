@@ -19,7 +19,6 @@
         <lombok.version>1.18.36</lombok.version>
     </properties>
 
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
