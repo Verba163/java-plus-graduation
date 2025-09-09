@@ -16,33 +16,22 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <properties>
-        <java.version>21</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
-        <org.mapstruct.version>1.6.1</org.mapstruct.version>
-        <springdoc-openapi-starter.version>2.1.0</springdoc-openapi-starter.version>
-    </properties>
-
     <modules>
         <module>stats</module>
         <module>infra</module>
         <module>core</module>
     </modules>
 
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+        <org.mapstruct.version>1.6.1</org.mapstruct.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc-openapi-starter.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -52,11 +41,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>${org.mapstruct.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -342,7 +342,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public EventFullDtoWithComments getPublicEventById(Long eventId) {
         QEvent event = QEvent.event;
         Event resultEvent = eventsRepository
