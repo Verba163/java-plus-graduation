@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class EventsViewsGetter {
+
     private final StatFeignClient statFeignClient;
 
     public Long getEventViews(Long eventId) {
@@ -27,12 +28,11 @@ public class EventsViewsGetter {
             List<StatViewDto> stats = statFeignClient.getStat(start, end, List.of(uri), true);
             return (stats != null && !stats.isEmpty()) ? stats.get(0).getHits() : 0L;
         } catch (Exception e) {
-            log.error("Ошибка при получении статистики для события ID {}: {}", eventId, e.getMessage());
+            log.error("Error while retrieving stats for event ID {}: {}", eventId, e.getMessage());
             return 0L;
         }
     }
 
-    // Метод для списка событий (возвращает Map<Long, Long>)
     public Map<Long, Long> getEventsViewsMap(List<Long> eventIds) {
         if (eventIds.isEmpty()) {
             return Map.of();
@@ -55,13 +55,12 @@ public class EventsViewsGetter {
                             id -> uriToHits.getOrDefault(createURIForEventId(id), 0L)
                     ));
         } catch (Exception e) {
-            log.error("Ошибка при получении статистики для событий {}: {}", eventIds, e.getMessage());
+            log.error("Error while retrieving stats for events {}: {}", eventIds, e.getMessage());
             return eventIds.stream().collect(Collectors.toMap(id -> id, id -> 0L));
         }
     }
 
     private String createURIForEventId(Long eventId) {
-        return "/events/" + eventId;  // Адаптируйте под ваш API-путь
+        return "/events/" + eventId;
     }
 }
-

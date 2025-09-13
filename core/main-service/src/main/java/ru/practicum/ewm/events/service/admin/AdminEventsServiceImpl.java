@@ -10,15 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.storage.CategoryRepository;
-import ru.practicum.ewm.client.StatFeignClient;
 import ru.practicum.ewm.error.exception.ConflictException;
 import ru.practicum.ewm.error.exception.DataIntegrityViolationException;
 import ru.practicum.ewm.error.exception.ValidationException;
 import ru.practicum.ewm.events.dto.EventFullDto;
-import ru.practicum.ewm.events.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.events.dto.UpdateEventCommonRequest;
 import ru.practicum.ewm.events.dto.parameters.MappingEventParameters;
 import ru.practicum.ewm.events.dto.parameters.SearchEventsParameters;
+import ru.practicum.ewm.events.dto.requests.UpdateEventAdminRequest;
+import ru.practicum.ewm.events.dto.requests.UpdateEventCommonRequest;
 import ru.practicum.ewm.events.enums.AdminEventAction;
 import ru.practicum.ewm.events.enums.EventPublishState;
 import ru.practicum.ewm.events.mapper.EventMapper;
@@ -45,7 +44,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final EventMapper eventMapper;
-    private final StatFeignClient statFeignClient;
+    private final UserMapper userMapper;
     private final EventsViewsGetter eventsViewsGetter;
 
 
@@ -131,18 +130,24 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                 event.setEventPublishState(EventPublishState.PUBLISHED);
                 event.setPublishedOn(now);
             }
-            default -> throw new UnsupportedOperationException("Unknown state action: " + stateAction);
+            default -> throw new UnsupportedOperationException(String.format(
+                    "Unknown state action: %s", stateAction
+            ));
         }
     }
 
     private Event getEventWithCheck(long eventId) {
         return eventsRepository.findById(eventId)
-                .orElseThrow(() -> new ConflictException("Event id=" + eventId + " not found."));
+                .orElseThrow(() -> new ConflictException(String.format(
+                        "Event id = %d not found.", eventId)
+                ));
     }
 
     private Category getCategoryWithCheck(long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ConflictException("Category id=" + categoryId + " not found."));
+                .orElseThrow(() -> new ConflictException(String.format(
+                        "Category id = %d not found.", categoryId)
+                ));
     }
 
     private void checkEventDateBeforeHours(LocalDateTime eventDateTime) {
@@ -213,7 +218,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         MappingEventParameters params = MappingEventParameters.builder()
                 .event(event)
                 .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
                 .views(views)
                 .confirmedRequests(confirmed)
                 .build();

@@ -88,7 +88,9 @@ public class CategoryServiceImpl implements CategoryService {
         checkAndGetCategory(catId);
 
         if (eventsRepository.countByCategoryId(catId) > 0) {
-            throw new ConflictException(String.format("Category with id '%d' is not empty", catId));
+            throw new ConflictException(String.format(
+                    "Category with id '%d' is not empty", catId
+            ));
         }
 
         log.info("Deleting category id: {}", catId);

@@ -1,11 +1,13 @@
 package ru.practicum.ewm.events.service.users;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.dto.StatHitDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.storage.CategoryRepository;
@@ -18,6 +20,9 @@ import ru.practicum.ewm.events.dto.parameters.EventsForUserParameters;
 import ru.practicum.ewm.events.dto.parameters.MappingEventParameters;
 import ru.practicum.ewm.events.dto.parameters.UpdateEventParameters;
 import ru.practicum.ewm.events.dto.parameters.UpdateRequestsStatusParameters;
+import ru.practicum.ewm.events.dto.requests.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.events.dto.requests.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.events.dto.requests.UpdateEventCommonRequest;
 import ru.practicum.ewm.events.enums.EventPublishState;
 import ru.practicum.ewm.events.enums.UserUpdateRequestAction;
 import ru.practicum.ewm.events.mapper.EventMapper;
@@ -51,6 +56,7 @@ public class UserEventsServiceImpl implements UserEventsService {
     private final RequestRepository requestRepository;
     private final CategoryMapper categoryMapper;
     private final EventMapper eventMapper;
+    private final UserMapper userMapper;
     private final RequestMapper requestMapper;
     private final StatFeignClient statFeignClient;
     private final EventsViewsGetter eventsViewsGetter;
@@ -58,13 +64,22 @@ public class UserEventsServiceImpl implements UserEventsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventShortDto> getEventsCreatedByUser(EventsForUserParameters params) {
+    public List<EventShortDto> getEventsCreatedByUser(EventsForUserParameters params, HttpServletRequest request) {
         Long userId = params.getUserId();
         ensureUserExists(userId);
 
         Pageable pageable = createPageable(params.getFrom(), params.getSize());
 
         Page<Event> events = eventsRepository.findAllByInitiatorIdIs(userId, pageable);
+
+        StatHitDto statHitDto = StatHitDto.builder()
+                .app("main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        statFeignClient.hit(statHitDto);
 
         return mapToEventShortDtoList(events.getContent());
     }
@@ -85,9 +100,19 @@ public class UserEventsServiceImpl implements UserEventsService {
 
     @Override
     @Transactional(readOnly = true)
-    public EventFullDto getEventById(Long userId, Long eventId) {
+    public EventFullDto getEventById(Long userId, Long eventId, HttpServletRequest request) {
         Event event = getEventOrThrow(eventId);
         checkUserRightsOrThrow(userId, event);
+
+        StatHitDto statHitDto = StatHitDto.builder()
+                .app("main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        statFeignClient.hit(statHitDto);
+
         return mapToEventFullDto(event);
     }
 
@@ -154,7 +179,9 @@ public class UserEventsServiceImpl implements UserEventsService {
         long slotsLeft = (participantLimit == 0) ? requests.size() : (participantLimit - confirmedCount);
 
         if (slotsLeft <= 0) {
-            throw new DataIntegrityViolationException("Event id=" + event.getId() + " is full filled for requests.");
+            throw new DataIntegrityViolationException(
+                    String.format("Event id=%d is fully booked for requests.", event.getId())
+            );
         }
 
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult(new ArrayList<>(), new ArrayList<>());
@@ -178,7 +205,7 @@ public class UserEventsServiceImpl implements UserEventsService {
         for (Request request : requests) {
             if (request.getStatus() != RequestStatus.PENDING) {
                 throw new DataIntegrityViolationException(
-                        "Request id=" + request.getId() + " must have status PENDING."
+                        String.format("Request id=%d must have status PENDING.", request.getId())
                 );
             }
         }
@@ -197,29 +224,29 @@ public class UserEventsServiceImpl implements UserEventsService {
 
     private Event getEventOrThrow(long eventId) {
         return eventsRepository.findById(eventId)
-                .orElseThrow(() -> new ConflictException("Event id=" + eventId + " not found."));
+                .orElseThrow(() -> new ConflictException(String.format("Event id=%d not found.", eventId)));
     }
 
     private User getUserOrThrow(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ConflictException("User id=" + userId + " not found."));
+                .orElseThrow(() -> new ConflictException(String.format("User id=%d not found.", userId)));
     }
 
     private Category getCategoryOrThrow(long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ConflictException("Category id=" + categoryId + " not found."));
+                .orElseThrow(() -> new ConflictException(String.format("Category id=%d not found.", categoryId)));
     }
 
     private void ensureUserExists(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new ConflictException("User id=" + userId + " not found.");
+            throw new ConflictException(String.format("User id=%d not found.", userId));
         }
     }
 
     private void checkUserRightsOrThrow(long userId, Event event) {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ConflictException(
-                    "Access deny for user id=" + userId + " with event id=" + event.getId()
+                    String.format("Access denied for user id=%d with event id=%d", userId, event.getId())
             );
         }
     }
@@ -261,7 +288,7 @@ public class UserEventsServiceImpl implements UserEventsService {
                 MappingEventParameters.builder()
                         .event(event)
                         .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                        .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                        .initiator(userMapper.toUserShortDto(event.getInitiator()))
                         .confirmedRequests(confirmedReqs.getOrDefault(id, 0L))
                         .views(viewsMap.getOrDefault(id, 0L))
                         .build()
@@ -277,7 +304,7 @@ public class UserEventsServiceImpl implements UserEventsService {
                 MappingEventParameters.builder()
                         .event(event)
                         .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                        .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                        .initiator(userMapper.toUserShortDto(event.getInitiator()))
                         .confirmedRequests(confirmedReqs.getOrDefault(event.getId(), 0L))
                         .views(viewsMap.getOrDefault(event.getId(), 0L))
                         .build()

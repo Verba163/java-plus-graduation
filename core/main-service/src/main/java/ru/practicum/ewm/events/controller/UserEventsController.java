@@ -1,5 +1,6 @@
 package ru.practicum.ewm.events.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,9 @@ import ru.practicum.ewm.events.dto.*;
 import ru.practicum.ewm.events.dto.parameters.EventsForUserParameters;
 import ru.practicum.ewm.events.dto.parameters.UpdateEventParameters;
 import ru.practicum.ewm.events.dto.parameters.UpdateRequestsStatusParameters;
+import ru.practicum.ewm.events.dto.requests.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.events.dto.requests.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.events.dto.requests.UpdateEventUserRequest;
 import ru.practicum.ewm.events.service.users.UserEventsService;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
@@ -28,14 +32,15 @@ public class UserEventsController {
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsCreatedByUser(@PathVariable(USER_ID) Long userId,
                                                       @RequestParam(defaultValue = "0") Integer from,
-                                                      @RequestParam(defaultValue = "10") Integer size) {
+                                                      @RequestParam(defaultValue = "10") Integer size,
+                                                      HttpServletRequest request) {
         log.info("Request: get events for user id={}, from={}, size={}", userId, from, size);
         EventsForUserParameters eventsForUserRequestParams = EventsForUserParameters.builder()
                 .userId(userId)
                 .from(from)
                 .size(size)
                 .build();
-        return userEventsService.getEventsCreatedByUser(eventsForUserRequestParams);
+        return userEventsService.getEventsCreatedByUser(eventsForUserRequestParams, request);
     }
 
     @PostMapping(PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
@@ -49,9 +54,10 @@ public class UserEventsController {
     @GetMapping(PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto getEventById(@PathVariable(USER_ID) Long userId,
-                                     @PathVariable(EVENT_ID) Long eventId) {
+                                     @PathVariable(EVENT_ID) Long eventId,
+                                     HttpServletRequest request) {
         log.info("Request: get event id={} for user id={}", eventId, userId);
-        return userEventsService.getEventById(userId, eventId);
+        return userEventsService.getEventById(userId, eventId, request);
     }
 
     @PatchMapping(PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)

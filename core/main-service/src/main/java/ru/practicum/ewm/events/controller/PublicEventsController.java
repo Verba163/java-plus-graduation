@@ -58,7 +58,7 @@ public class PublicEventsController {
                 .build();
 
         log.info("Request: search public events. Query={}", searchPublicEventsParameters);
-        return publicEventsService.searchPublicEvents(searchPublicEventsParameters);
+        return publicEventsService.searchPublicEvents(searchPublicEventsParameters, request);
     }
 
     @GetMapping(PUBLIC_API_PREFIX + EVENT_ID_PATH)

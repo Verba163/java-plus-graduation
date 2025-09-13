@@ -33,7 +33,6 @@ import ru.practicum.ewm.user.mapper.UserMapper;
 import ru.practicum.ewm.util.Util;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -51,15 +50,14 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
     private final CategoryMapper categoryMapper;
+    private final UserMapper userMapper;
     private final EventMapper eventMapper;
     private final StatFeignClient statFeignClient;
     private final EventsViewsGetter eventsViewsGetter;
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
     @Transactional(readOnly = true)
     @Override
-    public List<EventFullDto> searchPublicEvents(SearchPublicEventsParameters searchParams) {
+    public List<EventFullDto> searchPublicEvents(SearchPublicEventsParameters searchParams, HttpServletRequest request) {
 
         QEvent event = QEvent.event;
 
@@ -74,6 +72,15 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         Map<Long, Long> confirmedRequestsMap = getConfirmedRequestsMap(eventIds);
 
         Comparator<Event> sortingComparator = buildSortingComparator(searchParams.getSort(), eventIds);
+
+        StatHitDto statHitDto = StatHitDto.builder()
+                .app("main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        statFeignClient.hit(statHitDto);
 
         return filteredEvents.stream()
                 .sorted(sortingComparator)
@@ -202,7 +209,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         MappingEventParameters params = MappingEventParameters.builder()
                 .event(event)
                 .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequestsMap.getOrDefault(eventId, 0L))
                 .views(views)
                 .comments(comments)
@@ -215,7 +222,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         MappingEventParameters params = MappingEventParameters.builder()
                 .event(event)
                 .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequests)
                 .views(views)
                 .build();

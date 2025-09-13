@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface PublicEventsService {
 
-    List<EventFullDto> searchPublicEvents(SearchPublicEventsParameters searchParams);
+    List<EventFullDto> searchPublicEvents(SearchPublicEventsParameters searchParams, HttpServletRequest request);
 
     List<CommentShortDto> getAllEventComments(GetAllCommentsParameters parameters);
 

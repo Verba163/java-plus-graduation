@@ -1,8 +1,8 @@
 package ru.practicum.ewm.events.service.users;
 
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.ewm.events.dto.EventFullDto;
-import ru.practicum.ewm.events.dto.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.events.dto.requests.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.events.dto.EventShortDto;
 import ru.practicum.ewm.events.dto.NewEventDto;
 import ru.practicum.ewm.events.dto.parameters.EventsForUserParameters;
@@ -15,7 +15,7 @@ import java.util.List;
 public interface UserEventsService {
     
     
-    List<EventShortDto> getEventsCreatedByUser(EventsForUserParameters eventsForUserParameters);
+    List<EventShortDto> getEventsCreatedByUser(EventsForUserParameters eventsForUserParameters, HttpServletRequest request);
 
     EventFullDto updateEvent(UpdateEventParameters updateEventParameters);
 
@@ -27,5 +27,5 @@ public interface UserEventsService {
     EventFullDto createEvent(Long userId, NewEventDto newEventDto);
 
     
-    EventFullDto getEventById(Long userId, Long eventId);
+    EventFullDto getEventById(Long userId, Long eventId, HttpServletRequest request);
 }

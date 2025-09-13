@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     @Override
@@ -33,9 +34,9 @@ public class UserServiceImpl implements UserService {
             throw new DataIntegrityViolationException(String.format("Email must be unique: %s", newUserRequestDto.getEmail()));
         }
 
-        User user = UserMapper.toUserEntity(newUserRequestDto);
+        User user = userMapper.toUserEntity(newUserRequestDto);
         log.debug("Received POST request to create user: {}", newUserRequestDto);
-        return UserMapper.toUserDto(userRepository.save(user));
+        return userMapper.toUserDto(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         }
 
         return userPage.stream()
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long userId) {
         return userRepository.findById(userId)
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toUserDto)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %d not found", userId)));
     }
 

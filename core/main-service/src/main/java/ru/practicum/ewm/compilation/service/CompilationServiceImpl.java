@@ -41,6 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CategoryMapper categoryMapper;
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -173,7 +174,7 @@ public class CompilationServiceImpl implements CompilationService {
         MappingEventParameters params = MappingEventParameters.builder()
                 .event(event)
                 .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
-                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequestsMap.getOrDefault(event.getId(), 0L))
                 .views(viewsMap.getOrDefault(event.getId(), 0L))
                 .build();
