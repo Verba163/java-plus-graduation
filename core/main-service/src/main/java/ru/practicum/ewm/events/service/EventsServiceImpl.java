@@ -17,23 +17,8 @@ import ru.practicum.ewm.error.exception.ConflictException;
 import ru.practicum.ewm.error.exception.DataIntegrityViolationException;
 import ru.practicum.ewm.error.exception.NotFoundException;
 import ru.practicum.ewm.error.exception.ValidationException;
-import ru.practicum.ewm.events.dto.EventFullDto;
-import ru.practicum.ewm.events.dto.EventFullDtoWithComments;
-import ru.practicum.ewm.events.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.ewm.events.dto.EventRequestStatusUpdateResult;
-import ru.practicum.ewm.events.dto.EventShortDto;
-import ru.practicum.ewm.events.dto.LocationDto;
-import ru.practicum.ewm.events.dto.NewEventDto;
-import ru.practicum.ewm.events.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.events.dto.UpdateEventCommonRequest;
-import ru.practicum.ewm.events.dto.UpdateEventUserRequest;
-import ru.practicum.ewm.events.dto.parameters.EventsForUserParameters;
-import ru.practicum.ewm.events.dto.parameters.GetAllCommentsParameters;
-import ru.practicum.ewm.events.dto.parameters.MappingEventParameters;
-import ru.practicum.ewm.events.dto.parameters.SearchEventsParameters;
-import ru.practicum.ewm.events.dto.parameters.SearchPublicEventsParameters;
-import ru.practicum.ewm.events.dto.parameters.UpdateEventParameters;
-import ru.practicum.ewm.events.dto.parameters.UpdateRequestsStatusParameters;
+import ru.practicum.ewm.events.dto.*;
+import ru.practicum.ewm.events.dto.parameters.*;
 import ru.practicum.ewm.events.enums.AdminEventAction;
 import ru.practicum.ewm.events.enums.EventPublishState;
 import ru.practicum.ewm.events.enums.SortingEvents;
@@ -71,6 +56,9 @@ public class EventsServiceImpl implements EventsService {
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
+    private final CategoryMapper categoryMapper;
+    private final EventMapper eventMapper;
+    private final RequestMapper requestMapper;
 
     private final EventsViewsGetter eventsViewsGetter;
 
@@ -95,7 +83,7 @@ public class EventsServiceImpl implements EventsService {
         checkEventDateBeforeHours(newEventDto.getEventDate());
         User user = getUserWithCheck(userId);
         Category category = getCategoryWithCheck(newEventDto.getCategory());
-        Event event = EventMapper.fromNewEventDto(newEventDto, category);
+        Event event = eventMapper.fromNewEventDto(newEventDto, category);
         event.setCreatedOn(Util.getNowTruncatedToSeconds());
         event.setInitiator(user);
         return createEventFullDto(eventsRepository.save(event));
@@ -122,7 +110,7 @@ public class EventsServiceImpl implements EventsService {
             throw new DataIntegrityViolationException("Only pending or canceled events can be changed.");
         }
 
-        UpdateEventCommonRequest commonRequest = EventMapper.userUpdateRequestToCommonRequest(updateEventUserRequest);
+        UpdateEventCommonRequest commonRequest = eventMapper.userUpdateRequestToCommonRequest(updateEventUserRequest);
         updateCommonEventProperties(event, commonRequest);
 
         if (updateEventUserRequest.getStateAction() != null) {
@@ -142,7 +130,7 @@ public class EventsServiceImpl implements EventsService {
         checkUserRights(userId, event);
         List<Request> requests = requestRepository.findByEventId(eventId);
         return requests.stream()
-                .map(RequestMapper::toRequestDto)
+                .map(requestMapper::toRequestDto)
                 .toList();
     }
 
@@ -186,12 +174,12 @@ public class EventsServiceImpl implements EventsService {
         for (Request request : requests) {
             if (action == UserUpdateRequestAction.REJECTED || canConfirmRequestsNumber <= 0) {
                 request.setStatus(RequestStatus.REJECTED);
-                result.getRejectedRequests().add(RequestMapper.toRequestDto(request));
+                result.getRejectedRequests().add(requestMapper.toRequestDto(request));
                 continue;
             }
 
             request.setStatus(RequestStatus.CONFIRMED);
-            result.getConfirmedRequests().add(RequestMapper.toRequestDto(request));
+            result.getConfirmedRequests().add(requestMapper.toRequestDto(request));
             canConfirmRequestsNumber--;
         }
 
@@ -239,7 +227,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateRequest) {
         Event event = getEventWithCheck(eventId);
-        UpdateEventCommonRequest commonRequest = EventMapper.adminUpdateRequestToCommonRequest(updateRequest);
+        UpdateEventCommonRequest commonRequest = eventMapper.adminUpdateRequestToCommonRequest(updateRequest);
         updateCommonEventProperties(event, commonRequest);
 
         if (updateRequest.getStateAction() != null) {
@@ -474,12 +462,12 @@ public class EventsServiceImpl implements EventsService {
 
         MappingEventParameters eventFullDtoParams = MappingEventParameters.builder()
                 .event(event)
-                .categoryDto(CategoryMapper.toCategoryDto(event.getCategory()))
+                .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequestsMap.get(id))
                 .views(eventsViewsMap.get(id))
                 .build();
-        return EventMapper.toEventFullDto(eventFullDtoParams);
+        return eventMapper.toEventFullDto(eventFullDtoParams);
     }
 
     private EventFullDtoWithComments createEventFullDtoWithComments(Event event) {
@@ -492,24 +480,24 @@ public class EventsServiceImpl implements EventsService {
 
         MappingEventParameters eventFullDtoParams = MappingEventParameters.builder()
                 .event(event)
-                .categoryDto(CategoryMapper.toCategoryDto(event.getCategory()))
+                .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequestsMap.get(id))
                 .views(eventsViewsMap.get(id))
                 .comments(comments)
                 .build();
-        return EventMapper.toEventEventFullDtoWithComments(eventFullDtoParams);
+        return eventMapper.toEventFullDtoWithComments(eventFullDtoParams);
     }
 
     private EventFullDto createEventFullDto(Event event, long views, long confirmedRequests) {
         MappingEventParameters eventFullDtoParams = MappingEventParameters.builder()
                 .event(event)
-                .categoryDto(CategoryMapper.toCategoryDto(event.getCategory()))
+                .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .confirmedRequests(confirmedRequests)
                 .views(views)
                 .build();
-        return EventMapper.toEventFullDto(eventFullDtoParams);
+        return eventMapper.toEventFullDto(eventFullDtoParams);
     }
 
     private List<EventFullDto> createEventFullDtoList(List<Event> events) {
@@ -523,12 +511,12 @@ public class EventsServiceImpl implements EventsService {
                 .map(event -> {
                     MappingEventParameters eventFullDtoParams = MappingEventParameters.builder()
                             .event(event)
-                            .categoryDto(CategoryMapper.toCategoryDto(event.getCategory()))
+                            .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
                             .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                             .confirmedRequests(confirmedRequestsMap.get(event.getId()))
                             .views(eventsViewsMap.get(event.getId()))
                             .build();
-                    return EventMapper.toEventFullDto(eventFullDtoParams);
+                    return eventMapper.toEventFullDto(eventFullDtoParams);
                 })
                 .toList();
     }
@@ -544,13 +532,13 @@ public class EventsServiceImpl implements EventsService {
                 .map(event -> {
                     MappingEventParameters mappingEventParameters = MappingEventParameters.builder()
                             .event(event)
-                            .categoryDto(CategoryMapper.toCategoryDto(event.getCategory()))
+                            .categoryDto(categoryMapper.toCategoryDto(event.getCategory()))
                             .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                             .confirmedRequests(confirmedRequestsMap.get(event.getId()))
                             .views(eventsViewsMap.get(event.getId()))
                             .build();
 
-                    return EventMapper.toEventShortDto(mappingEventParameters);
+                    return eventMapper.toEventShortDto(mappingEventParameters);
                 })
                 .toList();
     }

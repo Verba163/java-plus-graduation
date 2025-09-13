@@ -7,32 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.StatHitDto;
 import ru.practicum.ewm.client.StatClient;
 import ru.practicum.ewm.comments.dto.CommentShortDto;
-import ru.practicum.ewm.events.constants.EventsConstants;
-import ru.practicum.ewm.events.dto.EventFullDto;
-import ru.practicum.ewm.events.dto.EventFullDtoWithComments;
-import ru.practicum.ewm.events.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.ewm.events.dto.EventRequestStatusUpdateResult;
-import ru.practicum.ewm.events.dto.EventShortDto;
-import ru.practicum.ewm.events.dto.NewEventDto;
-import ru.practicum.ewm.events.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.events.dto.UpdateEventUserRequest;
-import ru.practicum.ewm.events.dto.parameters.EventsForUserParameters;
-import ru.practicum.ewm.events.dto.parameters.GetAllCommentsParameters;
-import ru.practicum.ewm.events.dto.parameters.SearchEventsParameters;
-import ru.practicum.ewm.events.dto.parameters.SearchPublicEventsParameters;
-import ru.practicum.ewm.events.dto.parameters.UpdateEventParameters;
-import ru.practicum.ewm.events.dto.parameters.UpdateRequestsStatusParameters;
+import ru.practicum.ewm.events.dto.*;
+import ru.practicum.ewm.events.dto.parameters.*;
 import ru.practicum.ewm.events.enums.SortingEvents;
 import ru.practicum.ewm.events.service.EventsService;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
@@ -41,13 +21,8 @@ import ru.practicum.ewm.util.Util;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.ewm.events.constants.EventsConstants.EVENT_ID;
-import static ru.practicum.ewm.events.constants.EventsConstants.EVENT_ID_PATH;
-import static ru.practicum.ewm.events.constants.EventsConstants.PRIVATE_API_PREFIX_USER_ID_EVENT_ID;
-import static ru.practicum.ewm.events.constants.EventsConstants.PRIVATE_API_USER_EVENT_REQUESTS;
-import static ru.practicum.ewm.events.constants.EventsConstants.PUBLIC_API_PREFIX_COMMENTS;
-import static ru.practicum.ewm.events.constants.EventsConstants.PUBLIC_API_PREFIX_USER_ID;
-import static ru.practicum.ewm.events.constants.EventsConstants.USER_ID;
+import static ru.practicum.ewm.events.constants.EventsApiPath.*;
+
 
 @RestController
 @Slf4j
@@ -67,7 +42,7 @@ public class EventsController {
     }
 
     // region PRIVATE
-    @GetMapping(EventsConstants.PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
+    @GetMapping(PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsCreatedByUser(@PathVariable(USER_ID) Long userId,
                                                       @RequestParam(defaultValue = "0") Integer from,
@@ -81,7 +56,7 @@ public class EventsController {
         return eventsService.getEventsCreatedByUser(eventsForUserRequestParams);
     }
 
-    @PostMapping(EventsConstants.PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
+    @PostMapping(PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable(USER_ID) Long userId,
                                     @Valid @RequestBody NewEventDto newEventDto) {
@@ -89,7 +64,7 @@ public class EventsController {
         return eventsService.createEvent(userId, newEventDto);
     }
 
-    @GetMapping(EventsConstants.PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)
+    @GetMapping(PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto getEventById(@PathVariable(USER_ID) Long userId,
                                      @PathVariable(EVENT_ID) Long eventId) {
@@ -97,7 +72,7 @@ public class EventsController {
         return eventsService.getEventById(userId, eventId);
     }
 
-    @PatchMapping(EventsConstants.PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)
+    @PatchMapping(PRIVATE_API_PREFIX + PRIVATE_API_PREFIX_USER_ID_EVENT_ID)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable(USER_ID) Long userId,
                                     @PathVariable(EVENT_ID) Long eventId,
@@ -112,7 +87,7 @@ public class EventsController {
         return eventsService.updateEvent(updateEventParameters);
     }
 
-    @GetMapping(EventsConstants.PRIVATE_API_PREFIX + PRIVATE_API_USER_EVENT_REQUESTS)
+    @GetMapping(PRIVATE_API_PREFIX + PRIVATE_API_USER_EVENT_REQUESTS)
     @ResponseStatus(HttpStatus.OK)
     public List<ParticipationRequestDto> getRequestsForEvent(@PathVariable(USER_ID) Long userId,
                                                              @PathVariable(EVENT_ID) Long eventId) {
@@ -120,7 +95,7 @@ public class EventsController {
         return eventsService.getRequestsForEvent(userId, eventId);
     }
 
-    @PatchMapping(EventsConstants.PRIVATE_API_PREFIX + PRIVATE_API_USER_EVENT_REQUESTS)
+    @PatchMapping(PRIVATE_API_PREFIX + PRIVATE_API_USER_EVENT_REQUESTS)
     @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult updateRequestsForEvent(@PathVariable(USER_ID) Long userId,
                                                                  @PathVariable(EVENT_ID) Long eventId,
@@ -137,17 +112,17 @@ public class EventsController {
     // endregion
 
     // region ADMIN
-    @GetMapping(EventsConstants.ADMIN_API_PREFIX)
+    @GetMapping(ADMIN_API_PREFIX)
     @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> searchEvents(
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<String> states,
             @RequestParam(required = false) List<Long> categories,
 
-            @DateTimeFormat(pattern = EventsConstants.DATA_TIME_FORMAT)
+            @DateTimeFormat(pattern = DATA_TIME_FORMAT)
             @RequestParam(required = false) LocalDateTime rangeStart,
 
-            @DateTimeFormat(pattern = EventsConstants.DATA_TIME_FORMAT)
+            @DateTimeFormat(pattern = DATA_TIME_FORMAT)
             @RequestParam(required = false) LocalDateTime rangeEnd,
 
             @RequestParam(required = false, defaultValue = "0") Integer from,
@@ -165,7 +140,7 @@ public class EventsController {
         return eventsService.searchEvents(searchEventsParameters);
     }
 
-    @PatchMapping(EventsConstants.ADMIN_API_PREFIX + EVENT_ID_PATH)
+    @PatchMapping(ADMIN_API_PREFIX + EVENT_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEventByAdmin(@PathVariable(EVENT_ID) Long eventId,
                                            @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
@@ -175,17 +150,17 @@ public class EventsController {
     // endregion
 
     // region PUBLIC
-    @GetMapping(EventsConstants.PUBLIC_API_PREFIX)
+    @GetMapping(PUBLIC_API_PREFIX)
     @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> searchPublicEvents(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
 
-            @DateTimeFormat(pattern = EventsConstants.DATA_TIME_FORMAT)
+            @DateTimeFormat(pattern = DATA_TIME_FORMAT)
             @RequestParam(required = false) LocalDateTime rangeStart,
 
-            @DateTimeFormat(pattern = EventsConstants.DATA_TIME_FORMAT)
+            @DateTimeFormat(pattern = DATA_TIME_FORMAT)
             @RequestParam(required = false) LocalDateTime rangeEnd,
 
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
@@ -210,7 +185,7 @@ public class EventsController {
         return result;
     }
 
-    @GetMapping(EventsConstants.PUBLIC_API_PREFIX + EVENT_ID_PATH)
+    @GetMapping(PUBLIC_API_PREFIX + EVENT_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDtoWithComments getPublicEventById(@PathVariable(EVENT_ID) Long eventId, HttpServletRequest request) {
         log.info("Request: get public event with id={}", eventId);
@@ -233,7 +208,6 @@ public class EventsController {
         log.info("Request: get all comments for event id={}.Parameters={}", eventId, parameters);
         return eventsService.getAllEventComments(parameters);
     }
-    // endregion
 
     private void hitStat(HttpServletRequest request) {
         StatHitDto statHitDto = StatHitDto.builder()

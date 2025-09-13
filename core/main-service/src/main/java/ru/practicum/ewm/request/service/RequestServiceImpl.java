@@ -24,11 +24,12 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final EventsRepository eventsRepository;
+    private final RequestMapper requestMapper;
 
     @Override
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
         return requestRepository.findByRequesterId(userId).stream()
-                .map(RequestMapper::toRequestDto)
+                .map(requestMapper::toRequestDto)
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +55,7 @@ public class RequestServiceImpl implements RequestService {
                 .requester(requester)
                 .status(status)
                 .build();
-        return RequestMapper.toRequestDto(requestRepository.save(newRequest));
+        return requestMapper.toRequestDto(requestRepository.save(newRequest));
     }
 
     @Override
@@ -63,6 +64,6 @@ public class RequestServiceImpl implements RequestService {
                 .orElseThrow(() -> new NotFoundException(String.format("Request not found with id %d", requestId)));
 
         request.setStatus(RequestStatus.CANCELED);
-        return RequestMapper.toRequestDto(requestRepository.save(request));
+        return requestMapper.toRequestDto(requestRepository.save(request));
     }
 }

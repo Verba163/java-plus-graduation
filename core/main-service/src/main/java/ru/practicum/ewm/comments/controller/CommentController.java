@@ -16,7 +16,7 @@ import ru.practicum.ewm.comments.service.CommentService;
 
 import java.util.List;
 
-import static ru.practicum.ewm.comments.constants.CommentConstants.*;
+import static ru.practicum.ewm.comments.constants.CommentApiPath.*;
 
 @Slf4j
 @RestController

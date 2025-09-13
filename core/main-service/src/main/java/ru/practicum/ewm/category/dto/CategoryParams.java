@@ -1,5 +1,7 @@
 package ru.practicum.ewm.category.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +16,9 @@ public class CategoryParams {
 
     Long catId;
 
+    @Min(value = 0, message = "'from' parameter must be >= 0")
     Long from;
 
+    @Positive(message = "'size' parameter must be > 0")
     Long size;
 }

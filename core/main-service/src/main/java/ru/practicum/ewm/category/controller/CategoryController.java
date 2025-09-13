@@ -1,5 +1,6 @@
 package ru.practicum.ewm.category.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,14 +12,12 @@ import ru.practicum.ewm.category.service.CategoryService;
 
 import java.util.List;
 
+import static ru.practicum.ewm.category.constants.CategoryApiPath.*;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class CategoryController {
-    private static final String ADMIN_API_PREFIX = "/admin/categories";
-    private static final String PUBLIC_API_PREFIX = "/categories";
-    private static final String CAT_ID_PATH = "/{cat-id}";
-    private static final String CAT_ID = "cat-id";
 
     private final CategoryService categoryService;
 
@@ -45,7 +44,7 @@ public class CategoryController {
 
     @PostMapping(ADMIN_API_PREFIX)
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto createCategory(@RequestBody NewCategoryDto newCategoryDto) {
+    public CategoryDto createCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("Received POST request to create category: {}", newCategoryDto);
         return categoryService.createCategory(newCategoryDto);
     }
@@ -59,7 +58,8 @@ public class CategoryController {
 
     @PatchMapping(ADMIN_API_PREFIX + CAT_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto updateCategory(@PathVariable(CAT_ID) Long catId, @RequestBody NewCategoryDto newCategoryDto) {
+    public CategoryDto updateCategory(@PathVariable(CAT_ID) Long catId,
+                                      @RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("Received PATCH request to update category with id : {}, update : {}", catId, newCategoryDto);
 
         CategoryParams categoryParams = CategoryParams.builder()

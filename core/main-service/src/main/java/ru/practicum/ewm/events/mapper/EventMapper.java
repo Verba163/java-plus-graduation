@@ -2,14 +2,7 @@ package ru.practicum.ewm.events.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.category.model.Category;
-import ru.practicum.ewm.events.dto.EventFullDto;
-import ru.practicum.ewm.events.dto.EventFullDtoWithComments;
-import ru.practicum.ewm.events.dto.EventShortDto;
-import ru.practicum.ewm.events.dto.LocationDto;
-import ru.practicum.ewm.events.dto.NewEventDto;
-import ru.practicum.ewm.events.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.events.dto.UpdateEventCommonRequest;
-import ru.practicum.ewm.events.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.events.dto.*;
 import ru.practicum.ewm.events.dto.parameters.MappingEventParameters;
 import ru.practicum.ewm.events.model.Event;
 
@@ -53,7 +46,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventFullDtoWithComments toEventEventFullDtoWithComments(MappingEventParameters eventFullDtoParams) {
+    public static EventFullDtoWithComments toEventFullDtoWithComments(MappingEventParameters eventFullDtoParams) {
         Event event = eventFullDtoParams.getEvent();
 
         return EventFullDtoWithComments.builder()

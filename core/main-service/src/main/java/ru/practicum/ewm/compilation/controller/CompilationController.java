@@ -12,14 +12,12 @@ import ru.practicum.ewm.compilation.service.CompilationService;
 
 import java.util.List;
 
+import static ru.practicum.ewm.compilation.constants.CompilationApiPath.*;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class CompilationController {
-    private static final String ADMIN_API_PREFIX = "/admin/compilations";
-    private static final String PUBLIC_API_PREFIX = "/compilations";
-    private static final String COMP_ID_PATH = "/{comp-id}";
-    private static final String COMP_ID = "comp-id";
 
     private final CompilationService compilationService;
 

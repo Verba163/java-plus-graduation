@@ -1,10 +1,8 @@
 package ru.practicum.ewm.category.dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -14,5 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewCategoryDto {
 
+    @NotBlank(message = "Name can't be empty")
+    @Size(max = 50, message = "Name can't be more than 50 symbols")
     String name;
 }

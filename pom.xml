@@ -22,13 +22,13 @@
         <module>core</module>
     </modules>
 
-    <properties>
-        <java.version>21</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
-        <org.mapstruct.version>1.6.1</org.mapstruct.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-    </properties>
+        <properties>
+            <java.version>21</java.version>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+            <org.mapstruct.version>1.6.1</org.mapstruct.version>
+            <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -39,6 +39,12 @@
                 <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${org.mapstruct.version}</version>
             </dependency>
 
         </dependencies>

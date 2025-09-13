@@ -1,6 +1,6 @@
 package ru.practicum.ewm.comments.constants;
 
-public class CommentConstants {
+public interface CommentApiPath {
     public static final String PRIVATE_API_PREFIX = "/users/{user-id}/comments";
     public static final String PRIVATE_API_PREFIX_COMMENT_ID = "/users/{user-id}/comments/{comment-id}";
 

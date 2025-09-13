@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.dto.StatViewDto;
 import ru.practicum.ewm.client.StatClient;
-import ru.practicum.ewm.events.constants.EventsConstants;
+import ru.practicum.ewm.events.constants.EventsApiPath;
 import ru.practicum.ewm.util.Util;
 
 import java.time.LocalDateTime;
@@ -48,7 +48,7 @@ public class EventsViewsGetter {
     }
 
     private String createURIForEventId(long id) {
-        return String.join("", EventsConstants.PUBLIC_API_PREFIX, "/", String.valueOf(id));
+        return String.join("", EventsApiPath.PUBLIC_API_PREFIX, "/", String.valueOf(id));
     }
 }
 
