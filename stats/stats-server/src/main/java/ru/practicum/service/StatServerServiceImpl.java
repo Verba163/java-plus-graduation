@@ -14,29 +14,30 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StatServerServiceImpl implements StatServerService {
+
     private final StatServerRepository statServerRepository;
     private final StatMapper statMapper;
 
     @Override
     public void hit(StatHitDto statHitDto) {
+
         Stat stat = statMapper.toStatEntity(statHitDto);
         statServerRepository.save(stat);
     }
 
     @Override
     public List<StatViewDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        List<StatViewDto> result;
 
-        if (uris != null && !uris.isEmpty() && unique) {
-            result = statServerRepository.getStats(start, end, uris, true);
-        } else if (uris != null && !uris.isEmpty()) {
-            result = statServerRepository.getStats(start, end, uris);
+        boolean hasUris = uris != null && !uris.isEmpty();
+
+        if (hasUris && unique) {
+            return statServerRepository.getStats(start, end, uris, true);
+        } else if (hasUris) {
+            return statServerRepository.getStats(start, end, uris);
         } else if (unique) {
-            result = statServerRepository.getStats(start, end, true);
+            return statServerRepository.getStats(start, end, true);
         } else {
-            result = statServerRepository.getStats(start, end);
+            return statServerRepository.getStats(start, end);
         }
-
-        return result;
     }
 }

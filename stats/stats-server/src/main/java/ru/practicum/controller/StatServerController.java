@@ -5,12 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.StatHitDto;
 import ru.practicum.dto.StatViewDto;
 import ru.practicum.error.exception.StatsIllegalDateTime;
@@ -30,8 +25,10 @@ public class StatServerController {
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public void hit(@Valid @RequestBody StatHitDto statHitDto) {
-        log.info(String.format("Request to make hit: %s", statHitDto));
+        log.info("Received request to register hit: app='{}', uri='{}', ip='{}', timestamp='{}'",
+                statHitDto.getApp(), statHitDto.getUri(), statHitDto.getIp(), statHitDto.getTimestamp());
         statServerService.hit(statHitDto);
+        log.info("Hit registered successfully for URI: {}", statHitDto.getUri());
     }
 
     @GetMapping("/stats")
@@ -41,17 +38,25 @@ public class StatServerController {
             @RequestParam @DateTimeFormat(pattern = DATETIME_PATTERN) LocalDateTime end,
             @RequestParam(required = false, defaultValue = "") List<String> uris,
             @RequestParam(required = false, defaultValue = "false") boolean unique
-            ) {
-        log.info("Request to get stats: from '{}' to '{}'. Unique is '{}', uris: '{}'", start, end, unique, uris);
+    ) {
+        log.info("Received request to get stats: start='{}', end='{}', unique='{}', uris='{}'",
+                start, end, unique, uris);
 
+        validateDateTimeParams(start, end);
+
+        List<StatViewDto> stats = statServerService.getStats(start, end, uris, unique);
+        log.info("Stats retrieved successfully: {} records found", stats.size());
+        return stats;
+    }
+
+    private void validateDateTimeParams(LocalDateTime start, LocalDateTime end) {
         if (start == null || end == null) {
-            throw new StatsIllegalDateTime("Params 'end' and 'start' can not be NULL.");
+            log.warn("Validation failed: 'start' or 'end' is null");
+            throw new StatsIllegalDateTime("Request parameters 'start' and 'end' cannot be null.");
         }
-
         if (end.isBefore(start)) {
-            throw new StatsIllegalDateTime("Request param 'end' must be after 'start'.");
+            log.warn("Validation failed: 'end' ({}) is before 'start' ({})", end, start);
+            throw new StatsIllegalDateTime("Request parameter 'end' must be after 'start'.");
         }
-
-        return statServerService.getStats(start, end, uris, unique);
     }
 }
