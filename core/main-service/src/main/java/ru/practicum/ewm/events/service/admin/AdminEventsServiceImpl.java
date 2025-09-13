@@ -188,7 +188,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
 
     private Map<Long, Long> getConfirmedRequestsMap(List<Long> eventIds) {
         return eventsRepository.getConfirmedRequestsForEvents(eventIds).stream()
-                .collect(Collectors.toMap(pair -> pair.getFirst(), pair -> pair.getLast()));
+                .collect(Collectors.toMap(List::getFirst, List::getLast));
     }
 
     private EventFullDto createEventFullDto(Event event) {

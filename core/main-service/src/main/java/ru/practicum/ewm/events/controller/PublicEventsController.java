@@ -63,7 +63,8 @@ public class PublicEventsController {
 
     @GetMapping(PUBLIC_API_PREFIX + EVENT_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
-    public EventFullDtoWithComments getPublicEventById(@PathVariable(EVENT_ID) Long eventId, HttpServletRequest request) {
+    public EventFullDtoWithComments getPublicEventById(@PathVariable(EVENT_ID) Long eventId,
+                                                       HttpServletRequest request) {
         log.info("Request: get public event with id={}", eventId);
         return publicEventsService.getPublicEventById(eventId, request);
     }

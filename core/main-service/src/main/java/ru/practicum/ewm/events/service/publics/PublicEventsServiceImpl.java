@@ -93,6 +93,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     }
 
     private BooleanExpression buildFilterCondition(QEvent event, SearchPublicEventsParameters params) {
+
         List<BooleanExpression> conditions = new ArrayList<>();
         conditions.add(event.eventPublishState.eq(EventPublishState.PUBLISHED));
 
@@ -103,9 +104,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
         if (params.getCategories() != null && !params.getCategories().isEmpty()) {
             List<Category> categories = categoryRepository.findAllById(params.getCategories());
-            if (categories.isEmpty()) {
-                throw new ValidationException("Categories from search query are not found.");
-            }
+
             conditions.add(event.category.id.in(params.getCategories()));
         }
 

@@ -27,12 +27,11 @@ public class UserEventsController {
 
     private final UserEventsService userEventsService;
 
-
     @GetMapping(PRIVATE_API_PREFIX + PUBLIC_API_PREFIX_USER_ID)
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsCreatedByUser(@PathVariable(USER_ID) Long userId,
-                                                      @RequestParam(defaultValue = "0") Integer from,
-                                                      @RequestParam(defaultValue = "10") Integer size,
+                                                      @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                      @RequestParam(required = false, defaultValue = "10") Integer size,
                                                       HttpServletRequest request) {
         log.info("Request: get events for user id={}, from={}, size={}", userId, from, size);
         EventsForUserParameters eventsForUserRequestParams = EventsForUserParameters.builder()

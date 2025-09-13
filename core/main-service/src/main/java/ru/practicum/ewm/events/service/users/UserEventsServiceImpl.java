@@ -65,12 +65,14 @@ public class UserEventsServiceImpl implements UserEventsService {
     @Override
     @Transactional(readOnly = true)
     public List<EventShortDto> getEventsCreatedByUser(EventsForUserParameters params, HttpServletRequest request) {
+
         Long userId = params.getUserId();
         ensureUserExists(userId);
 
         Pageable pageable = createPageable(params.getFrom(), params.getSize());
 
-        Page<Event> events = eventsRepository.findAllByInitiatorIdIs(userId, pageable);
+        List<Event> userEvents = eventsRepository.findAllByInitiatorIdIs(userId, pageable).stream()
+                .toList();
 
         StatHitDto statHitDto = StatHitDto.builder()
                 .app("main-service")
@@ -81,7 +83,7 @@ public class UserEventsServiceImpl implements UserEventsService {
 
         statFeignClient.hit(statHitDto);
 
-        return mapToEventShortDtoList(events.getContent());
+        return mapToEventShortDtoList(userEvents);
     }
 
     @Override
@@ -118,6 +120,7 @@ public class UserEventsServiceImpl implements UserEventsService {
 
     @Override
     public EventFullDto updateEvent(UpdateEventParameters params) {
+
         Event event = getEventOrThrow(params.getEventId());
         checkUserRightsOrThrow(params.getUserId(), event);
 
@@ -190,7 +193,7 @@ public class UserEventsServiceImpl implements UserEventsService {
             if (statusRequest.getStatus() == UserUpdateRequestAction.REJECTED || slotsLeft <= 0) {
                 req.setStatus(RequestStatus.REJECTED);
                 result.getRejectedRequests().add(requestMapper.toRequestDto(req));
-            } else { // Confirm request
+            } else {
                 req.setStatus(RequestStatus.CONFIRMED);
                 result.getConfirmedRequests().add(requestMapper.toRequestDto(req));
                 slotsLeft--;
