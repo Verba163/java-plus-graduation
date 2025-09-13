@@ -1,0 +1,196 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          refresh-interval: 60000
+      routes:
+        #роуты для public event
+        - id: public_event_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /events
+            - Method=GET
+        - id: public_event_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /events/{eventId:[0-9]+}
+            - Method=GET
+        - id: public_event_comments_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /events/{userId:[0-9]+}/comments
+            - Method=GET
+        #роуты для private event
+        - id: private_event_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/events
+            - Method=GET,POST
+        - id: private_event_specific_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/events/{eventId:[0-9]+}
+            - Method=GET,PATCH
+        - id: private_event_requests_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/events/{eventId:[0-9]+}/requests
+            - Method=GET,PATCH
+        #роуты для admin event
+        - id: admin_events_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/events
+            - Method=GET
+        - id: admin_event_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/events/{eventId:[0-9]+}
+            - Method=PATCH
+        #роуты для public categories
+        - id: public_categories_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /categories
+            - Method=GET
+        - id: public_categories_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /categories/{catId:[0-9]+}
+            - Method=GET
+        #роуты для admin categories
+        - id: admin_categories_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/categories
+            - Method=POST
+        - id: admin_categories_specific_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/categories/{catId:[0-9]+}
+            - Method=DELETE,PATCH
+        #роуты для public compilations
+        - id: public_compilations_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /compilations
+            - Method=GET
+        - id: public_compilations_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /compilations/{compId:[0-9]+}
+            - Method=GET
+        #роуты для admin compilations
+        - id: admin_compilations_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/compilations
+            - Method=POST
+        - id: admin_compilations_specific_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/compilations/{compId:[0-9]+}
+            - Method=DELETE,PATCH
+        #роуты для admin users
+        - id: admin_users_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/users
+            - Method=GET,POST
+        - id: admin_users_delete_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/users/{userId:[0-9]+}
+            - Method=DELETE
+        #роуты для private requests
+        - id: private_requests_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/requests
+            - Method=GET,POST
+        - id: private_requests_cancel_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/requests/{reqId:[0-9]+}/cancel
+            - Method=PATCH
+        #роуты для private comments
+        - id: private_comments_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/comments
+            - Method=POST,GET
+        - id: private_comments_specific_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /users/{userId:[0-9]+}/comments/{commentId:[0-9]+}
+            - Method=DELETE,PATCH,GET
+        #роуты для admin comments
+        - id: admin_comments_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/comments
+            - Method=GET
+        - id: admin_comments_patch_by_id_route
+          uri: lb://main-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /admin/comments/{commentId:[0-9]+}
+            - Method=PATCH
+
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
