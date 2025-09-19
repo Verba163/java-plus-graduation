@@ -1,0 +1,121 @@
+package ru.practicum.ewm.events.mapper;
+
+import org.springframework.stereotype.Component;
+import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.events.dto.*;
+import ru.practicum.ewm.events.dto.parameters.MappingEventParameters;
+import ru.practicum.ewm.events.dto.requests.UpdateEventAdminRequest;
+import ru.practicum.ewm.events.dto.requests.UpdateEventCommonRequest;
+import ru.practicum.ewm.events.dto.requests.UpdateEventUserRequest;
+import ru.practicum.ewm.events.model.Event;
+
+@Component
+public class EventMapper {
+    public Event fromNewEventDto(NewEventDto newEventDto, Category category) {
+        return Event.builder()
+                .title(newEventDto.getTitle())
+                .description(newEventDto.getDescription())
+                .annotation(newEventDto.getAnnotation())
+                .category(category)
+                .locationLat(newEventDto.getLocation().getLat())
+                .locationLon(newEventDto.getLocation().getLon())
+                .requestModeration(newEventDto.getRequestModeration())
+                .paid(newEventDto.getPaid())
+                .participantLimit(newEventDto.getParticipantLimit())
+                .eventDate(newEventDto.getEventDate())
+                .build();
+    }
+
+    public EventFullDto toEventFullDto(MappingEventParameters eventFullDtoParams) {
+        Event event = eventFullDtoParams.getEvent();
+
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(eventFullDtoParams.getCategoryDto())
+                .confirmedRequests(eventFullDtoParams.getConfirmedRequests())
+                .createdOn(event.getCreatedOn())
+                .description(event.getDescription())
+                .eventDate(event.getEventDate())
+                .initiator(eventFullDtoParams.getInitiator())
+                .location(new LocationDto(event.getLocationLat(), event.getLocationLon()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn())
+                .requestModeration(event.getRequestModeration())
+                .title(event.getTitle())
+                .state(event.getEventPublishState())
+                .views(eventFullDtoParams.getViews())
+                .build();
+    }
+
+    public EventFullDtoWithComments toEventFullDtoWithComments(MappingEventParameters eventFullDtoParams) {
+        Event event = eventFullDtoParams.getEvent();
+
+        return EventFullDtoWithComments.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(eventFullDtoParams.getCategoryDto())
+                .confirmedRequests(eventFullDtoParams.getConfirmedRequests())
+                .createdOn(event.getCreatedOn())
+                .description(event.getDescription())
+                .eventDate(event.getEventDate())
+                .initiator(eventFullDtoParams.getInitiator())
+                .location(new LocationDto(event.getLocationLat(), event.getLocationLon()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn())
+                .requestModeration(event.getRequestModeration())
+                .title(event.getTitle())
+                .state(event.getEventPublishState())
+                .views(eventFullDtoParams.getViews())
+                .comments(eventFullDtoParams.getComments())
+                .build();
+    }
+
+    public EventShortDto toEventShortDto(MappingEventParameters eventDtoParams) {
+        Event event = eventDtoParams.getEvent();
+
+        return EventShortDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(eventDtoParams.getCategoryDto())
+                .confirmedRequests(eventDtoParams.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .initiator(eventDtoParams.getInitiator())
+                .paid(event.getPaid())
+                .title(event.getTitle())
+                .views(eventDtoParams.getViews())
+                .build();
+    }
+
+    public UpdateEventCommonRequest userUpdateRequestToCommonRequest(UpdateEventUserRequest request) {
+        return UpdateEventCommonRequest.builder()
+                .annotation(request.getAnnotation())
+                .description(request.getDescription())
+                .location(request.getLocation())
+                .requestModeration(request.getRequestModeration())
+                .participantLimit(request.getParticipantLimit())
+                .category(request.getCategory())
+                .eventDate(request.getEventDate())
+                .paid(request.getPaid())
+                .title(request.getTitle())
+                .eventDate(request.getEventDate())
+                .build();
+    }
+
+    public UpdateEventCommonRequest adminUpdateRequestToCommonRequest(UpdateEventAdminRequest request) {
+        return UpdateEventCommonRequest.builder()
+                .annotation(request.getAnnotation())
+                .description(request.getDescription())
+                .location(request.getLocation())
+                .requestModeration(request.getRequestModeration())
+                .participantLimit(request.getParticipantLimit())
+                .category(request.getCategory())
+                .eventDate(request.getEventDate())
+                .paid(request.getPaid())
+                .title(request.getTitle())
+                .eventDate(request.getEventDate())
+                .build();
+    }
+}
