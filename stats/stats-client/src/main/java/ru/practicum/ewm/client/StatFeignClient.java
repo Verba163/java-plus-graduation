@@ -4,6 +4,7 @@ import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.StatHitDto;
 import ru.practicum.dto.StatViewDto;
@@ -13,7 +14,7 @@ import java.util.List;
 @FeignClient(name = "stats-server")
 public interface StatFeignClient {
 
-    @PostMapping("/hit")
+    @PostMapping(value = "/hit", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     StatHitDto hit(@Valid @RequestBody StatHitDto statDto) throws FeignException;
 
