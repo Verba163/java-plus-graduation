@@ -22,8 +22,8 @@ public class ConditionProperties {
                 .ifPresent(users -> conditions.add(event.initiatorId.in(users)));
 
         Optional.ofNullable(searchParams.getStates())
-                .filter(list -> !list.isEmpty())
-                .map(states -> states.stream()
+                .filter(statesList -> !statesList.isEmpty())
+                .map(statesList -> statesList.stream()
                         .map(EventPublishState::valueOf)
                         .toList())
                 .ifPresent(statesEnum -> conditions.add(event.eventPublishState.in(statesEnum)));
