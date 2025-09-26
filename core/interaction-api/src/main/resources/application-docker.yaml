@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: interaction-api
+  cloud:
+    config:
+      enabled: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+server:
+  port: 8282
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
+logging:
+  level:
+    feign: DEBUG
+

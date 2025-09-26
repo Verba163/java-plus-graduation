@@ -1,6 +1,15 @@
 server:
   port: 8761
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
 eureka:
   instance:
     hostname: localhost
