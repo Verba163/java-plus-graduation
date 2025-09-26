@@ -15,24 +15,26 @@ public class UpdateProperties {
     private final EventValidator eventValidator;
     private final CategoryService categoryService;
 
-    public void updateEventProperties(Event event, UpdateEventCommonRequest props) {
-        if (props.getEventDate() != null) {
-            eventValidator.checkEventDateIsValid(props.getEventDate());
-            event.setEventDate(props.getEventDate());
+    public void updateEventProperties(Event event, UpdateEventCommonRequest updateEventRequest) {
+        if (updateEventRequest.getEventDate() != null) {
+            eventValidator.checkEventDateIsValid(updateEventRequest.getEventDate());
+            event.setEventDate(updateEventRequest.getEventDate());
         }
-        if (props.getCategory() != null) {
-            event.setCategoryId(categoryService.getCategoryWithCheck(props.getCategory()).getId());
+        if (updateEventRequest.getCategory() != null) {
+            event.setCategoryId(categoryService.getCategoryWithCheck(updateEventRequest.getCategory()).getId());
         }
-        if (props.getTitle() != null) event.setTitle(props.getTitle());
-        if (props.getDescription() != null) event.setDescription(props.getDescription());
-        if (props.getAnnotation() != null) event.setAnnotation(props.getAnnotation());
-        if (props.getLocation() != null) {
-            LocationDto loc = props.getLocation();
+        if (updateEventRequest.getTitle() != null) event.setTitle(updateEventRequest.getTitle());
+        if (updateEventRequest.getDescription() != null) event.setDescription(updateEventRequest.getDescription());
+        if (updateEventRequest.getAnnotation() != null) event.setAnnotation(updateEventRequest.getAnnotation());
+        if (updateEventRequest.getLocation() != null) {
+            LocationDto loc = updateEventRequest.getLocation();
             event.setLocationLat(loc.getLat());
             event.setLocationLon(loc.getLon());
         }
-        if (props.getRequestModeration() != null) event.setRequestModeration(props.getRequestModeration());
-        if (props.getPaid() != null) event.setPaid(props.getPaid());
-        if (props.getParticipantLimit() != null) event.setParticipantLimit(props.getParticipantLimit());
+        if (updateEventRequest.getRequestModeration() != null)
+            event.setRequestModeration(updateEventRequest.getRequestModeration());
+        if (updateEventRequest.getPaid() != null) event.setPaid(updateEventRequest.getPaid());
+        if (updateEventRequest.getParticipantLimit() != null)
+            event.setParticipantLimit(updateEventRequest.getParticipantLimit());
     }
 }

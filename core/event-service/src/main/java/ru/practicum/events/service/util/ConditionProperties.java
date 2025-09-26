@@ -14,28 +14,28 @@ import java.util.Optional;
 @Component
 public class ConditionProperties {
 
-    public BooleanExpression buildSearchConditions(SearchEventsParameters params, QEvent event) {
+    public BooleanExpression buildSearchConditions(SearchEventsParameters searchParams, QEvent event) {
         List<BooleanExpression> conditions = new ArrayList<>();
 
-        Optional.ofNullable(params.getUsers())
+        Optional.ofNullable(searchParams.getUsers())
                 .filter(list -> !list.isEmpty())
                 .ifPresent(users -> conditions.add(event.initiatorId.in(users)));
 
-        Optional.ofNullable(params.getStates())
+        Optional.ofNullable(searchParams.getStates())
                 .filter(list -> !list.isEmpty())
                 .map(states -> states.stream()
                         .map(EventPublishState::valueOf)
                         .toList())
                 .ifPresent(statesEnum -> conditions.add(event.eventPublishState.in(statesEnum)));
 
-        Optional.ofNullable(params.getCategories())
+        Optional.ofNullable(searchParams.getCategories())
                 .filter(list -> !list.isEmpty())
                 .ifPresent(categories -> conditions.add(event.categoryId.in(categories)));
 
-        Optional.ofNullable(params.getRangeStart())
+        Optional.ofNullable(searchParams.getRangeStart())
                 .ifPresent(start -> conditions.add(event.eventDate.after(start)));
 
-        Optional.ofNullable(params.getRangeEnd())
+        Optional.ofNullable(searchParams.getRangeEnd())
                 .ifPresent(end -> conditions.add(event.eventDate.before(end)));
 
         return conditions.stream()
