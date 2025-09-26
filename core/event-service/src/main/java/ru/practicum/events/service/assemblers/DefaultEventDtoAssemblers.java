@@ -1,6 +1,7 @@
 package ru.practicum.events.service.assemblers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
@@ -15,9 +16,11 @@ import ru.practicum.interaction.events.dto.EventFullDtoWithComments;
 import ru.practicum.interaction.events.dto.EventShortDto;
 import ru.practicum.interaction.feign.clients.CommentsFeignClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefaultEventDtoAssemblers implements EventDtoAssemblers {
@@ -64,7 +67,12 @@ public class DefaultEventDtoAssemblers implements EventDtoAssemblers {
         Map<Long, Long> confirmedRequestsMap = requestService.getConfirmedRequestsMap(List.of(id));
         List<CommentShortDto> comments;
 
-        comments = commentsFeignClient.findFirstCommentsForEvent(id, 5);
+        try {
+            comments = commentsFeignClient.findFirstCommentsForEvent(id, 5);
+        } catch (Exception e) {
+            log.warn("Failed to fetch comments for event ID {}: {}", id, e.getMessage(), e);
+            comments = Collections.emptyList();
+        }
 
 
         MappingEventParameters eventFullDtoParams = eventMapper.createMappingEventParameterWithComments(event,
