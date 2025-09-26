@@ -29,7 +29,7 @@ public class FeignCommentServiceImpl implements FeignCommentService {
     }
 
     @Override
-    public List<CommentShortDto> findFirstCommentsForEvent(Long eventId, Long size) {
+    public List<CommentShortDto> findFirstCommentsForEvent(Long eventId, Integer size) {
         return commentRepository.findFirstCommentsForEvent(eventId, size).stream()
                 .map(commentMapper::toCommentShortDto)
                 .toList();

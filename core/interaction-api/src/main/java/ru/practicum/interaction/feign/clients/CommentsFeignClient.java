@@ -28,5 +28,5 @@ public interface CommentsFeignClient {
 
     @GetMapping(FIRST_COMMENTS_SEARCH)
     List<CommentShortDto> findFirstCommentsForEvent(@PathVariable(EVENT_ID) Long eventId,
-                                                    @RequestParam("size") Long size);
+                                                    @RequestParam("size") Integer size);
 }

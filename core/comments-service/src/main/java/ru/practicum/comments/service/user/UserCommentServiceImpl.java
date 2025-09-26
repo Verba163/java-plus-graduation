@@ -45,6 +45,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Override
     @Transactional
     public CommentDto createComment(Long userId, NewCommentDto newCommentDto) {
+
         UserDto user = userService.getUserById(userId);
         EventFullDto event = eventService.getEventById(newCommentDto.getEventId());
         ParticipationRequestDto request = participationService.getUserRequest(userId, newCommentDto.getEventId());
@@ -55,6 +56,7 @@ public class UserCommentServiceImpl implements UserCommentService {
         Comment comment = commentMapper.fromNewCommentDto(newCommentDto);
         comment.setAuthorId(user.getId());
         comment.setEventId(event.getId());
+        comment.setAuthorName(user.getName());
         comment.setCreatedOn(Util.getNowTruncatedToSeconds());
 
         Comment saved = commentRepository.save(comment);
@@ -65,7 +67,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Override
     public List<CommentDto> getComments(GetCommentsParameters parameters) {
         QComment comment = QComment.comment;
-        userService.getUserById(parameters.getUserId()); // проверка пользователя
+        userService.getUserById(parameters.getUserId());
 
         List<BooleanExpression> conditions = new ArrayList<>();
         Pageable page = createPageableObject(parameters.getFrom(), parameters.getSize());

@@ -45,7 +45,7 @@ public class FeignCommentController {
     @GetMapping(FIRST_COMMENTS_SEARCH)
     @ResponseStatus(HttpStatus.OK)
     public List<CommentShortDto> findFirstCommentsForEvent(@PathVariable(EVENT_ID) Long eventId,
-                                                           @RequestParam("size") Long size) {
+                                                           @RequestParam("size") Integer size) {
         log.info("Request: get first five comment for events id={}.", eventId);
         return feignCommentService.findFirstCommentsForEvent(eventId, size);
     }

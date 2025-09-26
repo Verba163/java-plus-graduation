@@ -12,7 +12,8 @@ management:
 
 eureka:
   instance:
-    hostname: localhost
+    preferIpAddress: true
+    hostname: eureka-server
   client:
     registerWithEureka: false
     fetchRegistry: false

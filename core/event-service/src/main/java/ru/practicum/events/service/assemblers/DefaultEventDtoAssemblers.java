@@ -64,7 +64,7 @@ public class DefaultEventDtoAssemblers implements EventDtoAssemblers {
         Map<Long, Long> confirmedRequestsMap = requestService.getConfirmedRequestsMap(List.of(id));
         List<CommentShortDto> comments;
 
-        comments = commentsFeignClient.findFirstCommentsForEvent(id, 5L);
+        comments = commentsFeignClient.findFirstCommentsForEvent(id, 5);
 
 
         MappingEventParameters eventFullDtoParams = eventMapper.createMappingEventParameterWithComments(event,

@@ -9,7 +9,7 @@ public interface FeignCommentService {
 
     List<CommentShortDto> getCommentsForEvent(GetAllCommentsParameters parameters);
 
-    List<CommentShortDto> findFirstCommentsForEvent(Long eventId, Long size);
+    List<CommentShortDto> findFirstCommentsForEvent(Long eventId, Integer size);
 
     List<List<Long>> getCommentsNumberForEvents(List<Long> eventIds);
 }

@@ -49,5 +49,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Queryds
             ORDER BY c.created_on DESC
             LIMIT ?2
             """)
-    List<Comment> findFirstCommentsForEvent(Long eventId, Long size);
+    List<Comment> findFirstCommentsForEvent(Long eventId, Integer size);
 }
