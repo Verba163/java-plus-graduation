@@ -18,8 +18,8 @@ public class ConditionProperties {
         List<BooleanExpression> conditions = new ArrayList<>();
 
         Optional.ofNullable(searchParams.getUsers())
-                .filter(list -> !list.isEmpty())
-                .ifPresent(users -> conditions.add(event.initiatorId.in(users)));
+                .filter(usersList -> !usersList.isEmpty())
+                .ifPresent(usersList -> conditions.add(event.initiatorId.in(usersList)));
 
         Optional.ofNullable(searchParams.getStates())
                 .filter(statesList -> !statesList.isEmpty())
@@ -29,8 +29,8 @@ public class ConditionProperties {
                 .ifPresent(statesEnum -> conditions.add(event.eventPublishState.in(statesEnum)));
 
         Optional.ofNullable(searchParams.getCategories())
-                .filter(list -> !list.isEmpty())
-                .ifPresent(categories -> conditions.add(event.categoryId.in(categories)));
+                .filter(categoriesList -> !categoriesList.isEmpty())
+                .ifPresent(categoriesList -> conditions.add(event.categoryId.in(categoriesList)));
 
         Optional.ofNullable(searchParams.getRangeStart())
                 .ifPresent(start -> conditions.add(event.eventDate.after(start)));
