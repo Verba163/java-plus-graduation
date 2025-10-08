@@ -16,4 +16,10 @@ public interface EventsApiPath {
     String USER_ID = "user-id";
     String EVENT_ID = "event-id";
     String EVENT_ID_PATH = "/{event-id}";
+
+    String RECOMMENDATION_PATH = "/recommendation";
+
+    String USER_API_HEADER = "X-EWM-USER-ID";
+
+    String LIKE_API_PATH = "/like";
 }

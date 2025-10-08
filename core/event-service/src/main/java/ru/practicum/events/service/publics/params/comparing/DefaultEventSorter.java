@@ -4,7 +4,7 @@ package ru.practicum.events.service.publics.params.comparing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.views.EventsViewsGetter;
+import ru.practicum.events.rating.EventRatingService;
 import ru.practicum.interaction.events.enums.SortingEvents;
 import ru.practicum.interaction.feign.clients.CommentsFeignClient;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class DefaultEventSorter implements EventSorter {
 
-    private final EventsViewsGetter eventsViewsGetter;
+    private final EventRatingService eventRatingService;
     private final CommentsFeignClient commentsFeignClient;
 
     @Override
@@ -27,9 +27,9 @@ public class DefaultEventSorter implements EventSorter {
             return Comparator.comparing(Event::getEventDate);
         }
         return switch (sort) {
-            case VIEWS -> {
-                Map<Long, Long> viewsMap = eventsViewsGetter.getEventsViewsMap(eventIds);
-                yield Comparator.comparingLong((Event e) -> viewsMap.getOrDefault(e.getId(), 0L)).reversed();
+            case RATING -> {
+                Map<Long, Double> ratingMap = eventRatingService.getRatingMap(eventIds);
+                yield Comparator.comparingDouble((Event e) -> ratingMap.getOrDefault(e.getId(), 0.0)).reversed();
             }
             case COMMENTS -> {
                 Map<Long, Long> commentsMap = getCommentsNumberMap(eventIds);

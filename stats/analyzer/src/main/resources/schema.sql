@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS users_action CASCADE;
+DROP TABLE IF EXISTS events_similarity CASCADE;
+
+CREATE TABLE IF NOT EXISTS events_similarity (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    event_a BIGINT NOT NULL,
+    event_b BIGINT NOT NULL,
+    score NUMERIC(5,2) NOT NULL,
+    timestamp TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users_actions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    timestamp TIMESTAMP NOT NULL
+);

@@ -21,7 +21,7 @@ public class EventShortDto {
     Long id;
     String annotation;
     String title;
-    Long views;
+    Double rating;
     CategoryDto category;
     Long confirmedRequests;
     UserShortDto initiator;
