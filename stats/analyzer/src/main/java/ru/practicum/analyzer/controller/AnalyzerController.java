@@ -1,5 +1,6 @@
 package ru.practicum.analyzer.controller;
 
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,23 +19,48 @@ public class AnalyzerController extends RecommendationsControllerGrpc.Recommenda
     public void getRecommendationsForUser(UserPredictionsRequestProto request,
                                           StreamObserver<RecommendedEventProto> responseObserver) {
         log.info("Start processing recommendation request for user: {}", request);
-        analyzerService.getRecommendationsForUser(request).forEach(responseObserver::onNext);
-        responseObserver.onCompleted();
+        try {
+            analyzerService.getRecommendationsForUser(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error processing getRecommendationsForUser", e);
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Internal server error")
+                    .withCause(e)
+                    .asRuntimeException());
+        }
     }
 
     @Override
     public void getSimilarEvents(SimilarEventsRequestProto request,
                                  StreamObserver<RecommendedEventProto> responseObserver) {
         log.info("Start processing similar events request: {}", request);
-        analyzerService.getSimilarEvents(request).forEach(responseObserver::onNext);
-        responseObserver.onCompleted();
+        try {
+            analyzerService.getSimilarEvents(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error processing getSimilarEvents", e);
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Internal server error")
+                    .withCause(e)
+                    .asRuntimeException());
+        }
     }
 
     @Override
     public void getInteractionsCount(InteractionsCountRequestProto request,
                                      StreamObserver<RecommendedEventProto> responseObserver) {
         log.info("Start processing interaction count request for event: {}", request);
-        analyzerService.getInteractionsCount(request).forEach(responseObserver::onNext);
-        responseObserver.onCompleted();
+        try {
+            analyzerService.getInteractionsCount(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error processing getInteractionsCount", e);
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Internal server error")
+                    .withCause(e)
+                    .asRuntimeException());
+        }
     }
+
 }

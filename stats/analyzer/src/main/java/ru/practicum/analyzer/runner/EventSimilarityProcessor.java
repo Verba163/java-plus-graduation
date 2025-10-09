@@ -8,8 +8,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.practicum.analyzer.consumer.UserActionConsumerService;
-import ru.practicum.analyzer.handlers.UserActionHandler;
+import ru.practicum.analyzer.consumer.EventSimilarityConsumerService;
+import ru.practicum.analyzer.handlers.EventSimilarityHandler;
+import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
 import ru.practicum.ewm.stats.avro.UserActionAvro;
 
 import java.time.Duration;
@@ -18,12 +19,12 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserActionProcessor implements Runnable {
+public class EventSimilarityProcessor implements Runnable {
 
-    private final UserActionConsumerService consumer;
-    private final UserActionHandler userActionHandler;
+    private final EventSimilarityConsumerService consumer;
+    private final EventSimilarityHandler eventSimilarityHandler;
 
-    @Value("${kafka.action-topic}")
+    @Value("${kafka.similarity-topic}")
     private String topic;
 
     private volatile boolean running = true;
@@ -48,13 +49,13 @@ public class UserActionProcessor implements Runnable {
 
                 if (!records.isEmpty()) {
                     for (ConsumerRecord<Long, SpecificRecordBase> record : records) {
-                        UserActionAvro avro = (UserActionAvro) record.value();
-                        log.info("Processing user action: {}", avro);
+                        EventSimilarityAvro avro = (EventSimilarityAvro) record.value();
+                        log.info("Processing event similarity: {}", avro);
                         try {
-                            userActionHandler.handle(avro);
-                            log.info("User action processed successfully: {}", avro);
+                            eventSimilarityHandler.handle(avro);
+                            log.info("Event similarity: processed successfully: {}", avro);
                         } catch (Exception e) {
-                            log.error("Error processing user action: {}", avro, e);
+                            log.error("Error processing event similarity:: {}", avro, e);
                         }
                     }
                     log.info("Committing offsets asynchronously");

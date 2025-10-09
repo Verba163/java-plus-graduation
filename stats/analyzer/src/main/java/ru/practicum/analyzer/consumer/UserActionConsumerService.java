@@ -19,13 +19,13 @@ import java.util.Properties;
 
 @Slf4j
 @Service
-public class KafkaConsumerService {
+public class UserActionConsumerService {
 
     private final KafkaConsumer<Long, SpecificRecordBase> kafkaConsumer;
 
-    public KafkaConsumerService(@Value("${kafka.bootstrap-servers}") String bootstrapServers,
-                                @Value("${kafka.group-id}") String groupId,
-                                @Value("${kafka.auto-commit}") boolean autoCommit) {
+    public UserActionConsumerService(@Value("${kafka.bootstrap-servers}") String bootstrapServers,
+                                     @Value("${kafka.group-id}") String groupId,
+                                     @Value("${kafka.auto-commit}") boolean autoCommit) {
         this.kafkaConsumer = new KafkaConsumer<>(createConsumerConfig(bootstrapServers, groupId, autoCommit));
     }
 
