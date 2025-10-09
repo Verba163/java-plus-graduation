@@ -32,11 +32,18 @@ public class UserActionHandler {
     }
 
     private ActionTypeAvro getActionTypeAvro(ActionTypeProto actionType) {
+
+        if (actionType == null) {
+            throw new IllegalArgumentException("Action Type cannot be null");
+        }
+
         return switch (actionType) {
             case ACTION_VIEW -> ActionTypeAvro.VIEW;
             case ACTION_REGISTER -> ActionTypeAvro.REGISTER;
             case ACTION_LIKE -> ActionTypeAvro.LIKE;
-            default -> throw new IllegalArgumentException("Unknown type");
+            default -> throw new IllegalArgumentException(String.format(
+                    "Unknown type of action type: %s", actionType
+            ));
         };
     }
 }
