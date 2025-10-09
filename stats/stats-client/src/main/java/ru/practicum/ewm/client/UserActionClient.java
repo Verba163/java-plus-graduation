@@ -18,6 +18,7 @@ public class UserActionClient {
     private UserActionControllerGrpc.UserActionControllerBlockingStub userClient;
 
     public void collectUserAction(long userId, long eventId, ActionTypeProto actionType, Instant instant) {
+
         UserActionProto request = buildUserActionRequest(userId, eventId, actionType, instant);
 
         try {

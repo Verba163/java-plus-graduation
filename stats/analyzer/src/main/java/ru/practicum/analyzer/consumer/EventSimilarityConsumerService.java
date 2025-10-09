@@ -25,7 +25,7 @@ public class EventSimilarityConsumerService {
     private final KafkaConsumer<Long, SpecificRecordBase> kafkaConsumer;
 
     public EventSimilarityConsumerService(@Value("${kafka.bootstrap-servers}") String bootstrapServers,
-                                          @Value("${kafka.group-id}") String groupId,
+                                          @Value("${kafka.group-id.similarity}") String groupId,
                                           @Value("${kafka.auto-commit}") boolean autoCommit) {
         this.kafkaConsumer = new KafkaConsumer<>(createConsumerConfig(bootstrapServers, groupId, autoCommit));
     }

@@ -42,12 +42,12 @@ public class EventSimilarityService {
                                             List<EventSimilarity> similarities,
                                             boolean isEventB,
                                             Long userId) {
-        for (EventSimilarity es : similarities) {
-            Long candidateEventId = isEventB ? es.getEventB() : es.getEventA();
+        for (EventSimilarity eventSimilarity : similarities) {
+            Long candidateEventId = isEventB ? eventSimilarity.getEventB() : eventSimilarity.getEventA();
             if (!userActionService.hasUserInteractedWithEvent(userId, candidateEventId)) {
                 recommendations.add(RecommendedEventProto.newBuilder()
                         .setEventId(candidateEventId)
-                        .setScore(es.getScore())
+                        .setScore(eventSimilarity.getScore())
                         .build());
             }
         }

@@ -62,5 +62,4 @@ public class AnalyzerController extends RecommendationsControllerGrpc.Recommenda
                     .asRuntimeException());
         }
     }
-
 }
