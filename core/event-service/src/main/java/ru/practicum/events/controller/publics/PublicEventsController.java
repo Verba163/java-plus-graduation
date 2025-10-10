@@ -1,6 +1,5 @@
 package ru.practicum.events.controller.publics;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,6 +9,7 @@ import ru.practicum.events.service.publics.PublicEventsService;
 import ru.practicum.interaction.comments.dto.CommentShortDto;
 import ru.practicum.interaction.events.dto.EventFullDto;
 import ru.practicum.interaction.events.dto.EventFullDtoWithComments;
+import ru.practicum.interaction.events.dto.EventShortDto;
 import ru.practicum.interaction.events.dto.parameters.GetAllCommentsParameters;
 import ru.practicum.interaction.events.dto.parameters.SearchPublicEventsParameters;
 import ru.practicum.interaction.events.enums.SortingEvents;
@@ -42,8 +42,7 @@ public class PublicEventsController {
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) SortingEvents sort,
             @RequestParam(required = false, defaultValue = "0") Integer from,
-            @RequestParam(required = false, defaultValue = "10") Integer size,
-            HttpServletRequest request) {
+            @RequestParam(required = false, defaultValue = "10") Integer size) {
 
         SearchPublicEventsParameters searchPublicEventsParameters = SearchPublicEventsParameters.builder()
                 .text(text)
@@ -58,16 +57,17 @@ public class PublicEventsController {
                 .build();
 
         log.info("Request: search public events. Query={}", searchPublicEventsParameters);
-        return publicEventsService.searchPublicEvents(searchPublicEventsParameters, request);
+        return publicEventsService.searchPublicEvents(searchPublicEventsParameters);
     }
 
     @GetMapping(PUBLIC_API_PREFIX + EVENT_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     public EventFullDtoWithComments getPublicEventById(@PathVariable(EVENT_ID) Long eventId,
-                                                       HttpServletRequest request) {
+                                                       @RequestHeader("X-EWM-USER-ID") long userId) {
         log.info("Request: get public event with id={}", eventId);
-        return publicEventsService.getPublicEventById(eventId, request);
+        return publicEventsService.getPublicEventById(eventId);
     }
+
 
     @GetMapping(PUBLIC_API_PREFIX_COMMENTS)
     @ResponseStatus(HttpStatus.OK)
@@ -84,5 +84,22 @@ public class PublicEventsController {
 
         log.info("Request: get all comments for event id={}.Parameters={}", eventId, parameters);
         return publicEventsService.getAllEventComments(parameters);
+    }
+
+    @GetMapping(PUBLIC_API_PREFIX + RECOMMENDATION_PATH)
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventShortDto> getRecommendation(@RequestHeader(USER_API_HEADER) long userId,
+                                                 @RequestParam(required = false, defaultValue = "5") int maxResult) {
+        log.info("Request: get recommendation for user with id={}", userId);
+        return publicEventsService.getRecommendation(userId, maxResult);
+    }
+
+    @PutMapping(PUBLIC_API_PREFIX + EVENT_ID_PATH + LIKE_API_PATH)
+    @ResponseStatus(HttpStatus.OK)
+    public void addLikeToEvent(@PathVariable(EVENT_ID) Long eventId,
+                               @RequestHeader(USER_API_HEADER) long userId) {
+        log.info("Request: put like for event with id={} from user with id={}", eventId, userId);
+
+        publicEventsService.addLikeToEvent(eventId, userId);
     }
 }

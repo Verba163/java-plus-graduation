@@ -11,7 +11,6 @@ import ru.practicum.events.service.assemblers.EventDtoAssemblers;
 import ru.practicum.events.service.external.category.CategoryService;
 import ru.practicum.events.service.external.request.RequestService;
 import ru.practicum.events.service.external.user.UserService;
-import ru.practicum.events.service.stats.EventStatsService;
 import ru.practicum.events.service.util.PaginationHelper;
 import ru.practicum.events.service.util.UpdateProperties;
 import ru.practicum.events.service.validation.EventValidator;
@@ -47,7 +46,6 @@ public class UserEventsServiceImpl implements UserEventsService {
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
     private final EventDtoAssemblers eventDtoAssemblers;
-    private final EventStatsService eventStatsService;
     private final RequestFeignClient requestFeignClient;
     private final PaginationHelper paginationHelper;
     private final RequestService requestService;
@@ -69,7 +67,6 @@ public class UserEventsServiceImpl implements UserEventsService {
         List<Event> userEvents = eventsRepository.findAllByInitiatorIdIs(userId, pageable).stream()
                 .toList();
 
-        eventStatsService.recordHit(request);
 
         return eventDtoAssemblers.createEventShortDtoList(userEvents);
     }
@@ -95,8 +92,6 @@ public class UserEventsServiceImpl implements UserEventsService {
     public EventFullDto getEventById(Long userId, Long eventId, HttpServletRequest request) {
         Event event = eventValidator.getEventWithCheck(eventId);
         eventValidator.checkUserRightsOrThrow(userId, event);
-
-        eventStatsService.recordHit(request);
 
         return eventDtoAssemblers.createEventFullDto(event);
     }

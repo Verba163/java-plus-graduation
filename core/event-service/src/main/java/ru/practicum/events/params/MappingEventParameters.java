@@ -21,6 +21,6 @@ public class MappingEventParameters {
     CategoryDto categoryDto;
     UserShortDto initiator;
     Long confirmedRequests;
-    Long views;
+    Double rating;
     List<CommentShortDto> comments;
 }

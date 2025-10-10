@@ -28,6 +28,20 @@ spring:
               args:
                 pattern: /events/{userId:[0-9]+}/comments
             - Method=GET
+        - id: public_id_recommendation_route
+          uri: lb://event-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /events/recommendations
+            - Method=GET
+        - id: public_id_event_like_route
+          uri: lb://event-service
+          predicates:
+            - name: Path
+              args:
+                pattern: /events/{eventId:[0-9]+}/like
+            - Method=PUT
         #роуты для private event
         - id: private_event_route
           uri: lb://event-service
