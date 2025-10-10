@@ -37,7 +37,7 @@ services:
     networks:
       - my-network
 
-      #Docker services launcher
+#Docker services launcher
 
 #  category-service:
 #    image: category-service-ewm
@@ -286,89 +286,94 @@ services:
 #      - SPRING_PROFILES_ACTIVE=docker
 #    networks:
 #      - my-network
-#
-#  collector-service:
-#    image: collector-service-ewm
-#    build:
-#      context: ./stats/collector
-#    ports:
-#      - "14301:8080"
-#      - "8187:8080"
-#    depends_on:
-#      kafka:
-#        condition: service_started
-#      kafka-init-topics:
-#        condition: service_started
-#      eureka-server:
-#        condition: service_healthy
-#      config-server:
-#        condition: service_healthy
-#    command: [ "/bin/sh", "-c", "\
-#          ./wait-for-http.sh eureka-server 8761 /eureka/apps && \
-#          ./wait-for-http.sh config-server 8888 /actuator/health && \
-#          java -jar app.jar" ]
-#    environment:
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-#      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888/
-#      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-#      - EUREKA_CLIENT_REGISTERWITHEUREKA=true
-#      - EUREKA_CLIENT_FETCHREGISTRY=true
-#      - GRPC_SERVER_ADDRESS=172.18.0.14
-#      - SPRING_APPLICATION_NAME=collector
-#      - SPRING_PROFILES_ACTIVE=docker
-#    networks:
-#      - my-network
-#
-#  eureka-server:
-#    container_name: eureka-server
-#    image: discovery-service-eureka
-#    build:
-#      context: ./infra/discovery-server
-#    ports:
-#      - "8761:8761"
-#    command: [ "/bin/sh", "-c", "./wait-for.sh eureka-server 8761 -- ./wait-for.sh config-server 8888 -- java -jar app.jar" ]
-#    environment:
-#      - EUREKA_INSTANCE_HOSTNAME=eureka-server
-#      - SPRING_APPLICATION_NAME=eureka-server
-#      - SPRING_PROFILES_ACTIVE=docker
-#    depends_on:
-#      kafka:
-#        condition: service_started
-#      kafka-init-topics:
-#        condition: service_started
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#    networks:
-#      - my-network
-#
-#  config-server:
-#    container_name: config-server
-#    image: config-server-native
-#    build:
-#      context: ./infra/config-server
-#    ports:
-#      - "8888:8888"
-#    depends_on:
-#      eureka-server:
-#        condition: service_healthy
-#    command: /bin/sh -c "./wait-for.sh eureka-server 8761 -- java -jar app.jar"
-#    environment:
-#      - SPRING_APPLICATION_NAME=config-server
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-#      - EUREKA_CLIENT_REGISTERWITHEUREKA=true
-#      - EUREKA_CLIENT_FETCHREGISTRY=true
-#      - SPRING_PROFILES_ACTIVE=docker,native
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#    networks:
-#      - my-network
-#
+
+  collector-service:
+    image: collector-service-ewm
+    build:
+      context: ./stats/collector
+    ports:
+      - "14301:14301"
+      - "8187:8187"
+    depends_on:
+      kafka:
+        condition: service_started
+      kafka-init-topics:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    command: [ "/bin/sh", "-c", "\
+          ./wait-for-http.sh eureka-server 8761 /eureka/apps && \
+          ./wait-for-http.sh config-server 8888 /actuator/health && \
+          java -jar app.jar" ]
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888/
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_REGISTERWITHEUREKA=true
+      - EUREKA_CLIENT_FETCHREGISTRY=true
+      - SPRING_APPLICATION_NAME=collector
+      - GRPC_CLIENT_ADDRESS=localhost
+      - GRPC_CLIENT_HOST=localhost
+      - GRPC_CLIENT_PORT=14301
+      - GRPC_SERVER_ADDRESS=0.0.0.0
+      - GRPC_SERVER_HOST=0.0.0.0
+      - GRPC_SERVER_PORT=14301
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - my-network
+
+  eureka-server:
+    container_name: eureka-server
+    image: discovery-service-eureka
+    build:
+      context: ./infra/discovery-server
+    ports:
+      - "8761:8761"
+    command: [ "/bin/sh", "-c", "./wait-for.sh eureka-server 8761 -- ./wait-for.sh config-server 8888 -- java -jar app.jar" ]
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=eureka-server
+      - SPRING_APPLICATION_NAME=eureka-server
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      kafka:
+        condition: service_started
+      kafka-init-topics:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - my-network
+
+  config-server:
+    container_name: config-server
+    image: config-server-native
+    build:
+      context: ./infra/config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    command: /bin/sh -c "./wait-for.sh eureka-server 8761 -- java -jar app.jar"
+    environment:
+      - SPRING_APPLICATION_NAME=config-server
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_CLIENT_REGISTERWITHEUREKA=true
+      - EUREKA_CLIENT_FETCHREGISTRY=true
+      - SPRING_PROFILES_ACTIVE=docker,native
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - my-network
+
 #  gateway-server:
 #    image: gateway
 #    build:

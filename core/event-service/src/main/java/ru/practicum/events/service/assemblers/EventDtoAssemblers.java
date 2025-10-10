@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EventDtoAssemblers {
 
-    public EventFullDto createEventFullDto(Event event, Double rating, Long requests);
+    EventFullDto createEventFullDto(Event event, Double rating, Long requests);
 
     EventFullDto createEventFullDto(Event event);
 

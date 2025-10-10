@@ -15,6 +15,7 @@ import ru.practicum.grpc.stats.collector.UserActionControllerGrpc;
 @GrpcService
 @RequiredArgsConstructor
 public class UserActionController extends UserActionControllerGrpc.UserActionControllerImplBase {
+
     private final UserActionHandler userActionHandler;
 
     @Override

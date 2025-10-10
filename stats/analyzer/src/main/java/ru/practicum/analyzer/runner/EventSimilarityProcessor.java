@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import ru.practicum.analyzer.consumer.EventSimilarityConsumerService;
 import ru.practicum.analyzer.handlers.EventSimilarityHandler;
 import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
-import ru.practicum.ewm.stats.avro.UserActionAvro;
 
 import java.time.Duration;
 import java.util.List;
